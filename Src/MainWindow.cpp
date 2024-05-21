@@ -5,20 +5,23 @@ MainWindow::MainWindow(QWidget* parent) :
     QMainWindow(parent),
     mSettings("AshenvaleZX", "ZXEngine Hub")
 {
+    QWidget* mainContainer = new QWidget();
+    mainContainer->setFixedSize(800, 390);
+
     QFont boldFont;
     boldFont.setBold(true);
 
-    auto btnAbout = new QPushButton("About", this);
+    auto btnAbout = new QPushButton("About", mainContainer);
     btnAbout->setGeometry(135, 300, 80, 30);
     btnAbout->setFont(boldFont);
     connect(btnAbout, &QPushButton::clicked, this, &MainWindow::PopInfo);
 
-    auto btnAdd = new QPushButton("Add", this);
+    auto btnAdd = new QPushButton("Add", mainContainer);
     btnAdd->setGeometry(420, 345, 100, 40);
     btnAdd->setFont(boldFont);
     connect(btnAdd, &QPushButton::clicked, this, &MainWindow::AddProject);
 
-    auto btnRemove = new QPushButton("Remove", this);
+    auto btnRemove = new QPushButton("Remove", mainContainer);
     btnRemove->setGeometry(580, 345, 100, 40);
     btnRemove->setFont(boldFont);
     connect(btnRemove, &QPushButton::clicked, this, &MainWindow::RemoveProject);
@@ -28,7 +31,7 @@ MainWindow::MainWindow(QWidget* parent) :
     this->setWindowIcon(appIcon);
 
     QPixmap pixmap(":/Images/logo.png");
-    QLabel* label = new QLabel(this);
+    QLabel* label = new QLabel(mainContainer);
     label->setGeometry(50, 50, 250, 250);
     pixmap = pixmap.scaled(label->width(), label->height(), Qt::KeepAspectRatio);
     label->setPixmap(pixmap);
@@ -39,9 +42,9 @@ MainWindow::MainWindow(QWidget* parent) :
     statusBar()->showMessage(mEnginePath);
 
     // Projects List
-    mProjectList = new QListWidget(this);
-    mProjectList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    mProjectList = new QListWidget(mainContainer);
     mProjectList->setGeometry(350, 30, 400, 300);
+    mProjectList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     UpdateProjectList();
 
     connect(mProjectList, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem* item){
@@ -59,8 +62,16 @@ MainWindow::MainWindow(QWidget* parent) :
             mSettings.setValue("Projects", mProjects);
         }
     });
+    
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(mainContainer, 0, Qt::AlignCenter);
 
-    this->resize(800, 400);
+    // Create a central mainContainer and set the layout
+    QWidget* centralWidget = new QWidget();
+    centralWidget->setLayout(layout);
+
+    // Set the central mainContainer of the window
+    this->setCentralWidget(centralWidget);
 }
 
 void MainWindow::SetEnginePath(const QString& path)
